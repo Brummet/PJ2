@@ -1,4 +1,4 @@
-/**
+/** Ryan Beasley 
  * **********************************************************************************
  *
  * CSC220 Programming Project#2
@@ -70,15 +70,12 @@ import java.util.*;
 
 public class LispExprEvaluator {
 
-    // Current input Lisp expression
     private String inputExpr;
 
     // Main expression stack & current operation stack, see algorithm in evaluate()
     private Stack<Object> thisExprStack;
     private Stack<Double> thisOpStack;
 
-    // Flag for debug msgs
-    //private boolean debug;
     // default constructor
     // set inputExpr to "" 
     // create stack objects
@@ -96,15 +93,14 @@ public class LispExprEvaluator {
         thisExprStack = new Stack();
         thisOpStack = new Stack();
     }
-
-    // set inputExpr to inputExpression 
-    // clear stack objects
+ 
+    // clears stack objects
     public void reset(String inputExpression) {
         inputExpr = inputExpression;
         if (!thisExprStack.isEmpty()) {
             thisExprStack.pop();
         }
-        if (!thisOpStack.isEmpty()){
+        if (!thisOpStack.isEmpty()) {
             thisOpStack.pop();
         }
     }
@@ -122,19 +118,18 @@ public class LispExprEvaluator {
         double result = 0.0;
         double temp = 0.0;
         String operator = null;
-        System.out.println("thisExprStack begin of eval opera" + thisExprStack);
 
+        // loop to run through exprStack, and push operands onto OpStack
         while (!thisExprStack.isEmpty()) {
             String pop = thisExprStack.pop().toString();
-            //temp = new Double(pop);
             Scanner scanThis = new Scanner(pop);
             if (scanThis.hasNextDouble()) {
                 temp = new Double(pop);
                 thisOpStack.push(temp);
             }
+            // to get the operator by itself and be used below to perform calculation
             if (scanThis.hasNext("\\D+")) {
                 operator = scanThis.next();
-                System.out.println("this is what was found: " + operator);
                 break;
                 //
             }
@@ -168,12 +163,8 @@ public class LispExprEvaluator {
                 break;
             case "*":
                 if (thisOpStack.empty()) {
-                    result = 0;
-                }
-                else if (thisOpStack.size() < 2){
                     result = 1;
-                }
-                else {
+                } else {
                     result = thisOpStack.pop();
                     while (!thisOpStack.empty()) {
                         result = result * thisOpStack.pop();
@@ -181,23 +172,24 @@ public class LispExprEvaluator {
                 }
                 break;
             case "/":
-                if (thisOpStack.empty()) {
-                    result = 0;
-                } else {
+                if (thisOpStack.size() < 2) {
+                    result = 1/thisOpStack.pop();
+                } 
+                else {
                     result = thisOpStack.pop();
                     while (!thisOpStack.empty()) {
-                        result = thisOpStack.pop() / result;
+                        result = result / thisOpStack.pop();
                     }
                 }
                 break;
 
         }
 
-        System.out.println("ThisOpStack in evalCurrOper:AFTER SW " + thisOpStack);
-        System.out.println("Result in curr opp: " + result);
+        //System.out.println("ThisOpStack in evalCurrOper:AFTER SW " + thisOpStack);
+        //System.out.println("Result in curr opp: " + result);
         thisExprStack.push(result);
-        
-         // add statements*/
+
+        // add statements*/
     }
 
     /**
@@ -293,9 +285,7 @@ public class LispExprEvaluator {
         Double result;
         System.out.println("Expression " + s);
         System.out.printf("Expected result : %s\n", expect);
-        System.out.println("Before reset: " + expr.thisExprStack + "Op stack" + expr.thisOpStack);//my line of code
         expr.reset(s);
-        System.out.println("After Reset: " + expr.thisExprStack + "Op stack" + expr.thisOpStack);   // my line of code
         result = expr.evaluate();
         System.out.printf("Evaluated result : %.2f\n", result);
         System.out.println("-----------------------------");
@@ -305,18 +295,17 @@ public class LispExprEvaluator {
     // define few test cases, exception may happen
     public static void main(String args[]) {
         LispExprEvaluator expr = new LispExprEvaluator();
-        //String test1 = "(+ (-2))";
-        //String test1 = "(+ (- 6) (* 2 3 4) (/ (+ 3) (* 1) (- 2 3 1)) (+))";
-        //String test2 = "(+ (- 632) (* 21 3 4) (/ (+ 32) (* 1) (- 21 3 1)) (+))";
+        String test1 = "(+ (- 6) (* 2 3 4) (/ (+ 3) (* 1) (- 2 3 1)) (+))";
+        String test2 = "(+ (- 632) (* 21 3 4) (/ (+ 32) (* 1) (- 21 3 1)) (+))";
         String test3 = "(+ (/ 2) (* 2) (/ (+ 1) (+ 1) (- 2 1 ))(*))";
-       // String test4 = "(+ (/2)(+))";
-       // String test5 = "(+ (/2 3 0))";
-       // String test6 = "(+ (/ 2) (* 2) (/ (+ 1) (+ 3) (- 2 1 ))))";
-       // evaluateExprTest(test1, expr, "16.50");
-       // evaluateExprTest(test2, expr, "-378.12");
+        String test4 = "(+ (/2)(+))";
+        String test5 = "(+ (/2 3 0))";
+        String test6 = "(+ (/ 2) (* 2) (/ (+ 1) (+ 3) (- 2 1 ))))";
+        evaluateExprTest(test1, expr, "16.50");
+        evaluateExprTest(test2, expr, "-378.12");
         evaluateExprTest(test3, expr, "4.50");
-       // evaluateExprTest(test4, expr, "0.50");
-       // evaluateExprTest(test5, expr, "Infinity or LispExprException");
-       // evaluateExprTest(test6, expr, "LispExprException");
+        evaluateExprTest(test4, expr, "0.50");
+        evaluateExprTest(test5, expr, "Infinity or LispExprException");
+        evaluateExprTest(test6, expr, "LispExprException");
     }
 }
